@@ -30,6 +30,7 @@ model Entry {
     photos   String?
     lat      String
     long     String
+    activity String   @default("")
 
     User User? @relation(fields: [userId], references: [id])
 }

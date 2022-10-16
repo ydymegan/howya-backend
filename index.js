@@ -26,11 +26,23 @@ const main = async () => {
 
   console.log("created user: ", user);
 
-  const entry = await createEntry(user.id, "this is a test entry 1", "1", "1");
+  const entry = await createEntry(
+    user.id,
+    "this is a test entry 1",
+    "1",
+    "1",
+    "Running"
+  );
 
   console.log("created entry 1: ", entry.id);
 
-  const entry2 = await createEntry(user.id, "this is a test entry 2", "2", "2");
+  const entry2 = await createEntry(
+    user.id,
+    "this is a test entry 2",
+    "2",
+    "2",
+    "Golf"
+  );
 
   console.log("created entry 2: ", entry2.id);
 };
@@ -59,13 +71,14 @@ async function getUser(userId) {
   return user;
 }
 
-async function createEntry(userId, content, lat, long) {
+async function createEntry(userId, content, lat, long, activity) {
   entry = await prisma.entry.create({
     data: {
       userId,
       content,
       lat,
       long,
+      activity,
     },
   });
 
@@ -112,6 +125,16 @@ async function getAllEntries() {
   return entries;
 }
 
+async function getAllEntriesByUserId(userId) {
+  const entries = await prisma.entry.findMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  return entries;
+}
+
 app.post("/create", (req, res) => {
   const { email, name, password, profilePic } = req.body;
   createUser(email, name, password, profilePic);
@@ -126,8 +149,8 @@ app.get("/getUser/:id", (req, res) => {
 });
 
 app.post("/createEntry", (req, res) => {
-  const { userId, content, lat, long } = req.body;
-  const entry = createEntry(userId, content, lat, long);
+  const { userId, content, lat, long, activity } = req.body;
+  const entry = createEntry(userId, content, lat, long, activity);
   console.log("Entry" + { entry } + "added");
 });
 
@@ -148,6 +171,13 @@ app.get("/getEntry/:id", (req, res) => {
   const id = req.params.id;
   return getEntryById(id).then((entry) => {
     res.send(entry);
+  });
+});
+
+app.get("/getAllEntriesById/:id", (req, res) => {
+  const id = req.params.id;
+  return getAllEntriesByUserId(id).then((entries) => {
+    res.send(entries);
   });
 });
 
