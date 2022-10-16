@@ -16,6 +16,25 @@ const prisma = new PrismaClient({
   },
 });
 
+const main = async () => {
+  const user = await createUser(
+    "test@gmail.com",
+    "test-1",
+    "test-1",
+    "www.google.com"
+  );
+
+  console.log("created user: ", user);
+
+  const entry = await createEntry(user.id, "this is a test entry 1", "1", "1");
+
+  console.log("created entry 1: ", entry.id);
+
+  const entry2 = await createEntry(user.id, "this is a test entry 2", "2", "2");
+
+  console.log("created entry 2: ", entry2.id);
+};
+
 async function createUser(email, name, password, profilePic) {
   user = await prisma.user.create({
     data: {
@@ -35,6 +54,7 @@ async function getUser(userId) {
       id: userId,
     },
   });
+  console.log(user);
 
   return user;
 }
@@ -100,9 +120,9 @@ app.post("/create", (req, res) => {
 
 app.get("/getUser/:id", (req, res) => {
   const id = req.params.id;
-  const user = getUser(id);
-  res.send(user);
-  // convert prisma to json
+  return getUser(id).then((user) => {
+    res.send(user);
+  });
 });
 
 app.post("/createEntry", (req, res) => {
@@ -113,20 +133,26 @@ app.post("/createEntry", (req, res) => {
 
 app.post("/getEntriesArea", (req, res) => {
   const { lat, long, top_dist, side_dist } = req.body;
-  const entries = getEntriesByDist(lat, long, top_dist, side_dist);
-  res.send(entries);
-  // convert prisma to json
+  return getEntriesByDist(lat, long, top_dist, side_dist).then((entries) => {
+    res.send(entries);
+  });
 });
 
 app.get("/getAllEntries", (req, res) => {
-  const entries = getAllEntries();
-  res.send(entries);
+  return getAllEntries().then((entries) => {
+    res.send(entries);
+  });
 });
 
 app.get("/getEntry/:id", (req, res) => {
   const id = req.params.id;
-  const entry = getEntryById(id);
-  res.send(entry);
+  return getEntryById(id).then((entry) => {
+    res.send(entry);
+  });
+});
+
+main().catch((e) => {
+  throw e;
 });
 
 let port = process.env.PORT;
