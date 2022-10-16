@@ -16,6 +16,21 @@ const prisma = new PrismaClient({
   },
 });
 
+const main = async () => {
+  const user = createUser(
+    "test@gmail.com",
+    "test-1",
+    "test-1",
+    "www.google.com"
+  );
+
+  console.log("created user: ", user.id);
+
+  const entry = createEntry(user.id, "this is a test entry", "1", "1");
+
+  console.log("created entry: ", entry.id);
+};
+
 async function createUser(email, name, password, profilePic) {
   user = await prisma.user.create({
     data: {
@@ -127,6 +142,10 @@ app.get("/getEntry/:id", (req, res) => {
   const id = req.params.id;
   const entry = getEntryById(id);
   res.send(entry);
+});
+
+main().catch((e) => {
+  throw e;
 });
 
 app.listen(3000, function () {
