@@ -1,1 +1,2 @@
-This repo is the backend of Howya
+https://devpost.com/software/howya
+
