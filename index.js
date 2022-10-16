@@ -125,6 +125,16 @@ async function getAllEntries() {
   return entries;
 }
 
+async function getAllEntriesByUserId(userId) {
+  const entries = await prisma.entry.findMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  return entries;
+}
+
 app.post("/create", (req, res) => {
   const { email, name, password, profilePic } = req.body;
   createUser(email, name, password, profilePic);
@@ -161,6 +171,13 @@ app.get("/getEntry/:id", (req, res) => {
   const id = req.params.id;
   return getEntryById(id).then((entry) => {
     res.send(entry);
+  });
+});
+
+app.get("/getAllEntriesById/:id", (req, res) => {
+  const id = req.params.id;
+  return getAllEntriesByUserId(id).then((entries) => {
+    res.send(entries);
   });
 });
 
